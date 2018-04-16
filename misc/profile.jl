@@ -7,13 +7,9 @@ using Plots
 Beamforming.verbose(false)
 
 function f()
-    s = sample(:array)
-    t = cut(s, 1110, 1140)
-    sx, sy, fk = Beamforming.fk(t, 1110, 1140, 6, 0.5, 0.1, 2, true)
-    sx, sy, fk
+    t = s = sample(:array)
+    # t = cut(s, 1110-100, 1140+100)
+    Beamforming.beamform(t, 1110, 1140, 6, 0.1)
 end
 
 Juno.@profiler f()
-sx, sy, fk = f()
-
-heatmap(sx, sy, fk')
