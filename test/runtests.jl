@@ -1,4 +1,4 @@
 using Beamforming
-using Base.Test
+using Test
 
 include("fk.jl")

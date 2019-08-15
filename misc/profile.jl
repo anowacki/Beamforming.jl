@@ -1,19 +1,20 @@
+import Pkg
+Pkg.activate(joinpath(@__DIR__, ".."))
 import Juno
-using SAC
 using Revise
-using Beamforming
+using Beamforming, Seis
 using Plots
 
 Beamforming.verbose(false)
 
 function f()
-    s = sample(:array)
-    t = cut(s, 1110, 1140)
-    sx, sy, fk = Beamforming.fk(t, 1110, 1140, 6, 0.5, 0.1, 2, true)
-    sx, sy, fk
+    t = Seis.sample_data(:array)
+    Beamforming.beamform(t, 1110, 1140, 6, 0.25)
 end
 
 Juno.@profiler f()
-sx, sy, fk = f()
+@time fk = f()
 
-heatmap(sx, sy, fk')
+heatmap(fk.sx, fk.sy, fk.power', aspect_ratio=:equal,
+    xlim=extrema(fk.sx), ylim=extrema(fk.sy),
+    c=Plots.cgrad([:white,:blue,:green,:yellow,:orange,:red]))
