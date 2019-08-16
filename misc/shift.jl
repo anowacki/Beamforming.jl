@@ -8,33 +8,6 @@ import Seis, Seis.Plot
 using BenchmarkTools
 import FFTW
 
-"""
-    synthetic_arrival(sx, sy) -> ::Vector{Seis.Trace}
-
-Calculate synthetic traces with an arrival at a set slowness (`sx`, `sy`)
-s/°
-"""
-function synthetic_arrival(sx, sy)
-    # Synthetic arrival
-    data = exp.(-(-50:0.01:50).^2/0.01)
-    # Grid of stations
-    delta = 0.01
-    nsta = 20
-    s = [Seis.Trace(0, delta, data) for _ in 1:nsta]
-    s.sta.lon = lon = 5rand(nsta) - 2.5
-    s.sta.lat = lat = 5rand(nsta) - 2.5
-    mlon, mlat = mean(lon), mean(lat)
-    # Shift arrivals to correct time
-    for (i, ss) in enumerate(s)
-        dist = Beamforming.delta(ss.sta.lon, ss.sta.lat, mlon, mlat, true)
-        az = Beamforming.azimuth(mlon, mlat, ss.sat.lon, ss.sta.lat, true)
-        dx = dist*sind(az) # °
-        dy = dist*cosd(az)
-        dt = sx*dx + sy*dy # s
-        ss.t = circshift(ss.t, -round(Int, dt/delta))
-    end
-    s
-end
 
 function shift!(s::Seis.Trace, Δ)
     s.t .= circshift(s.t, round(Int, Δ/s.delta))
