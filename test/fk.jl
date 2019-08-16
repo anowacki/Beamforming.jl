@@ -1,5 +1,4 @@
 using Test
-using Statistics: mean
 
 using Seis
 using Beamforming, Beamforming.Synth
