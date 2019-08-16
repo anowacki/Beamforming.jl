@@ -1,0 +1,18 @@
+name = "Beamforming"
+uuid = "bdfe4746-bf38-11e9-1e2c-db8d7c02fe8b"
+authors = ["Andy Nowacki <a.nowacki@leeds.ac.uk>"]
+version = "0.1.0"
+
+[deps]
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+Geodesics = "6aaf26a4-c633-11e8-35ae-8904cb805353"
+Geodesy = "0ef565a4-170c-5f04-8de2-149903a85f3d"
+SAC = "03de775e-c638-11e8-38ea-6915ef5cdf5f"
+Seis = "dd80f4d8-c2f6-58bd-9bd3-4635f134261d"
+
+[extras]
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Statistics", "Test"]
