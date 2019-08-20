@@ -315,7 +315,7 @@ Convert slowness in s/° at the surface of the Earth to s/km."""
 s_per_km(s_degree, r_earth=R_EARTH_KM_DEFAULT) = s_degree*360/(2π*r_earth)
 
 "List of available stacking routines"
-const available_stack_methods = [:linear]
+const available_stack_methods = (:linear, :nthroot, :phaseweight)
 
 """
     stack(S::AbstractArray{Seis.Trace}, time_range, align=zeros(length(S)), weight; method=:linear) -> s::Seis.Trace
@@ -336,13 +336,14 @@ if not all traces can be included in the stack.
 
 If provided, traces are weighted by the values in `weight`, which are normalised
 to sum to unity.
+
+Available stacking methods are: $(available_stack_methods).
 """
 function stack(S::AbstractArray{<:Seis.Trace{T}}, time_range,
                align::Union{Symbol,AbstractArray}=zeros(T, length(S));
-               weights=ones(T, length(S)),
-               method=:linear) where T
-    method in available_stack_methods ||
-        throw(ArgumentError("unrecognised stacking method"))
+               weights=ones(T, length(S))./length(S),
+               method=:linear,
+               n=nothing) where T
     # Convert to a vector of times if given as a symbol
     if typeof(align) == Symbol
         picks = getproperty(S.picks, align)
@@ -358,6 +359,18 @@ function stack(S::AbstractArray{<:Seis.Trace{T}}, time_range,
     if method == :linear
         stack_trace = _stack_linear([Seis.trace(s) for s in S],
             S[1].delta, S.b, delay, t1, t2, weights)
+    elseif method == :nthroot
+        n === nothing &&
+            throw(ArgumentError("n must be provided for nthroot stacking"))
+        stack_trace = _stack_nthroot([Seis.trace(s) for s in S],
+            n, S[1].delta, S.b, delay, t1, t2, weights)
+    elseif method == :phaseweight
+        n === nothing &&
+            throw(ArgumentError("n must be provided for phaseweighted stacking"))
+        stack_trace = _stack_phaseweight([Seis.trace(s) for s in S],
+            n, S[1].delta, S.b, delay, t1, t2, weights)
+    else
+        throw(ArgumentError("unrecognised stacking method"))
     end
     Seis.Trace{T}(t1, S[1].delta, stack_trace)
 end
@@ -381,6 +394,63 @@ function _stack_linear(a::Vector{<:AbstractArray}, delta::Real, b::Vector,
         w = weights[j]
         @simd for i in ip1:(ip1+npts-1)
             stack_trace[i-ip1+1] += a[j][i]*w
+        end
+    end
+    stack_trace
+end
+
+"""
+    _stack_nthroot(a::Vector{<:AbstractArray}, n, delta, b, delay, t1, t2, weights)
+
+Return an array containing the `n`throot stack of the vector of vectors `a`, whose
+start times are given in `b`, and where the stack is returned between times `t1` and `t2`
+(which can be negative if delay is also negative).  `delta` is the sampling interval
+for all the traces.
+
+The trace starts at time `t1` and has sample spacing `delta`.
+"""
+function _stack_nthroot(a::Vector{<:AbstractArray}, n, delta, b, delay, t1, t2, weights)
+    N, npts, b_shift, stack_trace = _stack_array(a, delta, b, delay, t1, t2)
+    @inbounds for j in 1:N
+        ip1 = round(Int, (t1 - b_shift[j])/delta) + 1
+        w = weights[j]
+        @simd for i in ip1:(ip1+npts-1)
+            stack_trace[i-ip1+1] += sign(a[j][i])*abs(a[j][i])^(1/n)*w
+        end
+    end
+    stack_trace .= sign.(stack_trace).*abs.(stack_trace).^n
+    stack_trace
+end
+
+"""
+    _stack_phaseweight(a::Vector{<:AbstractArray}, delta, b, delay, t1, t2, weights)
+
+Return an array containing the phaseweighted stack of the vector of vectors `a`, whose
+start times are given in `b`, and where the stack is returned between times `t1` and `t2`
+(which can be negative if delay is also negative).  `delta` is the sampling interval
+for all the traces.  The weighting power is given by `n`.
+
+The trace starts at time `t1` and has sample spacing `delta`.
+"""
+function _stack_phaseweight(a::Vector{<:AbstractArray{T}}, n, delta, b, delay, t1, t2, weights) where T
+    N, npts, b_shift, stack_trace = _stack_array(a, delta, b, delay, t1, t2)
+    # Collect shifted traces together
+    traces = Array{T}(undef, npts, N)
+    @inbounds for j in 1:N
+        ip1 = round(Int, (t1 - b_shift[j])/delta) + 1
+        w = weights[j]
+        @simd for i in ip1:(ip1+npts-1)
+            traces[i-ip1+1,j] = a[j][i]*w
+        end
+    end
+    # Create instantaneous phases
+    phases = DSP.hilbert(traces)
+    phases .= phases./abs.(phases)
+    # Stack
+    @inbounds for i in 1:npts
+        weight = abs(sum(phases[i,:])/N)^n
+        @simd for j in 1:N
+            stack_trace[i] += traces[i,j]*weight/N
         end
     end
     stack_trace

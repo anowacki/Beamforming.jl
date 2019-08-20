@@ -6,7 +6,7 @@ and compute array response functions using `array_response_function`.
 """
 module Beamforming
 
-import Geodesy
+import DSP, Geodesy
 
 import Seis
 
