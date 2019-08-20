@@ -30,4 +30,8 @@ include("types.jl")
 include("sphericalgeom.jl")
 include("stacking.jl")
 
+# Submodules
+include("Synth.jl")
+import .Synth
+
 end # module

@@ -84,7 +84,7 @@ version = "0.3.0"
 [[Geodesics]]
 path = "/Users/nowacki/Applications/julia_pkgs/Geodesics"
 uuid = "6aaf26a4-c633-11e8-35ae-8904cb805353"
-version = "0.2.0"
+version = "0.2.2"
 
 [[Geodesy]]
 deps = ["CoordinateTransformations", "Dates", "LinearAlgebra", "StaticArrays", "Test"]
