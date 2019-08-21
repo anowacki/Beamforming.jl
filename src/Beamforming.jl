@@ -12,7 +12,8 @@ import Seis
 
 export
     array_response_function,
-    beamform
+    beamform,
+    stack
 
 # Custom type aliases
 const TraceArray{T} = AbstractArray{<:Seis.Trace{T}}

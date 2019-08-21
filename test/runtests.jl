@@ -1,4 +1,7 @@
 using Beamforming
 using Test
 
-include("fk.jl")
+@testset "All tests" begin
+    include("fk.jl")
+    include("stack.jl")
+end
