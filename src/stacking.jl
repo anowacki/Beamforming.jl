@@ -86,12 +86,13 @@ end
 array_centre(s::TraceArray) = array_centre(s.sta.lon, s.sta.lat)
 
 """
-    array_response_function(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg=false) -> sx, sy, arf
-    array_response_function(x, y, smax, ds, f1, f2, df, s_deg=false) -> sx, sy, arf
-    array_response_function(traces::Array{Seis.Trace}, args...) -> sx, sy, arf
+    array_response(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg=false) -> arf::ArrayResponse
+    array_response(x, y, smax, ds, f1, f2, df, s_deg=false) -> arf::ArrayResponse
+    array_response(traces::Array{Seis.Trace}, args...) -> arf::ArrayResponse
 
-Return the array response function `arf` at slownesses with east and north
-components `sx` and `sy` respectively, in s/km.  The ARF is computed between
+Return the array response function `arf.power` (an [`ArrayResponse`]@ref) at
+slownesses with east and north components `arf.sx` and `arf.sy` respectively,
+in s/km.  The ARF is computed between
 frequencies `f1` and `f2` Hz, spaced by `df` Hz.
 
 Provide either explicit limits on slowness `(sx1, sx2)` and `(sy1, sy2)` in the
@@ -101,10 +102,10 @@ plus the slowness spacing `ds`.
 `x` and `y` are the station coordinates in km; or an array of `Seis.Trace` `traces`
 can be given.
 
-Default input and output units of slowness are s/km.  Give `s_deg` as `true`
-to use s/° using the sphere radius `r`.
+Default input units of slowness are s/km.  Give `s_deg` as `true`
+to use s/°.
 """
-function array_response_function(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg=false)
+function array_response(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg=false)
     slowx = sx1:ds:sx2
     slowy = sy1:ds:sy2
     s_deg && ((slowx, slowy) = s_per_km.((slowx, slowy)))
@@ -114,10 +115,10 @@ function array_response_function(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg
     ((slowx, slowy) = s_per_degree.((slowx, slowy)))
     ArrayResponse(f, x, y, slowx, slowy, arf)
 end
-array_response_function(x, y, smax, ds, f1, f2, df, s_deg::Bool=false) =
-    array_response_function(x, y, -smax, smax, -smax, smax, ds, f1, f2, df, s_deg)
-array_response_function(s::TraceArray, args...) =
-    array_response_function(array_geometry(s)[1:2]..., args...)
+array_response(x, y, smax, ds, f1, f2, df, s_deg::Bool=false) =
+    array_response(x, y, -smax, smax, -smax, smax, ds, f1, f2, df, s_deg)
+array_response(s::TraceArray, args...) =
+    array_response(array_geometry(s)[1:2]..., args...)
 
 """    _compute_arf!(arf, x, y, sx, sy, f)
 

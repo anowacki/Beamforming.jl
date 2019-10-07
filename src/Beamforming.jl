@@ -11,7 +11,7 @@ import DSP, Geodesy
 import Seis
 
 export
-    array_response_function,
+    array_response,
     beamform,
     stack
 
