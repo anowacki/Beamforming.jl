@@ -1,18 +1,19 @@
 
 """
-    beamform(s::AbstractVector{Seis.Trace}, t1, t2, sx1, sx2, sy1, sy2, ds; n=1) -> ::BeamformGrid
+    beamform(s::AbstractVector{Seis.Trace}, t1, t2, sx1, sx2, sy1, sy2, ds; maxima=1, method=:linear, n=1) -> ::BeamformGrid
 
 Compute normalised beam power at each horizontal slowness point
 `sx1:ds:sx2` × `sy1:ds:sy2` s/°, between times `t1` and `t2` s.  The slowness
 grid is spaced by `ds` s/°.
 
-The `n` maximum beam power points are set in the returned `BeamformGrid`.
+The `maxima` maximum beam power points are set in the returned `BeamformGrid`.
 
-    beamform(s, t1, t2, smax, ds; n=1) -> ::BeamformGrid
+    beamform(s, t1, t2, smax, ds; maxima=1, method=:linear, n=1) -> ::BeamformGrid
 
 Use a slowness grid of `-smax:ds:smax` in both dimensions.
 """
-function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds; n=1) where T
+function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds;
+        maxima=1, method=:linear, n=nothing) where T
     sx = s_per_km.(sx1:ds:sx2)
     sy = s_per_km.(sy1:ds:sy2)
     nx, ny = length.((sx, sy))
@@ -20,15 +21,15 @@ function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds; n=1) where T
     x, y, z = array_geometry(s.sta.lon, s.sta.lat, zeros(length(s)))
     for (iy, isy) in enumerate(sy), (ix, isx) in enumerate(sx)
         align = -(x.*isx + y.*isy)
-        S = stack(s, (t1,t2), align)
+        S = stack(s, (t1,t2), align; method=method, n=n)
         beam_power[ix,iy] = sum(Seis.trace(S).^2)
     end
     sx, sy = s_per_degree.(sx), s_per_degree.(sy)
     lon, lat = array_centre(s)
-    sx_max, sy_max, p, β = find_maxima(sx, sy, beam_power, n)
+    sx_max, sy_max, p, β = find_maxima(sx, sy, beam_power, maxima)
     BeamformGrid{T}(lon, lat, x, y,
         collect(sx1:ds:sx2), collect(sy1:ds:sy2),
-        beam_power./maximum(beam_power), n,
+        beam_power./maximum(beam_power), maxima,
         sx_max, sy_max, p, β)
 end
 beamform(s::TraceArray, t1, t2, smax, ds; kwargs...) =
