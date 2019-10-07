@@ -30,6 +30,7 @@ verbose(tf::Bool) = VERBOSE[] = tf
 include("types.jl")
 include("sphericalgeom.jl")
 include("stacking.jl")
+include("plots.jl")
 
 # Submodules
 include("Synth.jl")

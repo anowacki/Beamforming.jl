@@ -110,8 +110,8 @@ function array_response_function(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg
     f = f1:df:f2
     arf = zeros(length(slowx), length(slowy))
     _compute_arf!(arf, x, y, slowx, slowy, f)
-    s_deg && ((slowx, slowy) = s_per_degree.((slowx, slowy)))
-    slowx, slowy, arf./maximum(arf)
+    ((slowx, slowy) = s_per_degree.((slowx, slowy)))
+    ArrayResponse(f, x, y, slowx, slowy, arf)
 end
 array_response_function(x, y, smax, ds, f1, f2, df, s_deg::Bool=false) =
     array_response_function(x, y, -smax, smax, -smax, smax, ds, f1, f2, df, s_deg)
