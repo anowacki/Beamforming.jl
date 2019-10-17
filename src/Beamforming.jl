@@ -8,7 +8,7 @@ module Beamforming
 
 import DSP, Geodesy
 
-import Seis
+import Seis, Geodesics
 
 export
     array_response,

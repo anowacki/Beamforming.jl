@@ -27,10 +27,10 @@ function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds;
     sx, sy = s_per_degree.(sx), s_per_degree.(sy)
     lon, lat = array_centre(s)
     sx_max, sy_max, p, β = find_maxima(sx, sy, beam_power, maxima)
-    BeamformGrid{T}(lon, lat, x, y,
+    BeamformGrid{T,eltype(s)}(lon, lat, x, y,
         collect(sx1:ds:sx2), collect(sy1:ds:sy2),
         beam_power./maximum(beam_power), maxima,
-        sx_max, sy_max, p, β)
+        sx_max, sy_max, p, β, s, method, n, t1, t2)
 end
 beamform(s::TraceArray, t1, t2, smax, ds; kwargs...) =
     beamform(s, t1, t2, -smax, smax, -smax, smax, ds; kwargs...)

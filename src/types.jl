@@ -1,12 +1,12 @@
 """
-    BeamformGrid{T}
+    BeamformGrid{T, S<:Seis.Trace}
 
 Struct containing the results of beamforming on a regular slowness grid and
 array coordinates.
 
 This can be plotted using [`Plots.plot`](@ref).
 """
-struct BeamformGrid{T}
+struct BeamformGrid{T, S<:Seis.Trace}
     "Reference longitude in ° of array"
     lon::T
     "Reference latitude in ° array"
@@ -31,7 +31,20 @@ struct BeamformGrid{T}
     pmax::Vector{T}
     "Backazimuth of nmax maxima (°)"
     bazmax::Vector{T}
+    "Input traces.  May be empty"
+    traces::Vector{S}
+    "Stackin method (e.g., :linear, :phaseweight)"
+    method::Symbol
+    "Order of stack (e.g. in nthroot or phaseweighted stacking)"
+    n::Union{Int,Nothing}
+    "Start time of stack"
+    t1::T
+    "End time of stack"
+    t2::T
 end
+
+"Return `true` if a `BeamformGrid` contains the traces used to construct it"
+_hastraces(bf::BeamformGrid) = length(bf.traces) > 0
 
 """
     ArrayResponse{T}
