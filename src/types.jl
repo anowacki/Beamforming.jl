@@ -33,7 +33,7 @@ struct BeamformGrid{T, S<:Seis.Trace}
     bazmax::Vector{T}
     "Input traces.  May be empty"
     traces::Vector{S}
-    "Stackin method (e.g., :linear, :phaseweight)"
+    "Stacking method (e.g., :linear, :phaseweight)"
     method::Symbol
     "Order of stack (e.g. in nthroot or phaseweighted stacking)"
     n::Union{Int,Nothing}
