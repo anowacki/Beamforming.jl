@@ -33,3 +33,11 @@ using Beamforming
         end
     end
 end
+
+@testset "Utilities" begin
+    @testset "s/° ↔ s/km" begin
+        @test Beamforming.s_per_degree(Beamforming.s_per_km(7, 1), 1) ≈ 7
+        @test Beamforming.s_per_degree(1, 1) ≈ 2π/360
+        @test Beamforming.s_per_degree(1) ≈ 111.19492664455873
+    end
+end
