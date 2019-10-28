@@ -102,3 +102,23 @@ Return `true` if all points in arrays `lon` and `lat` are on the sphere.
 """
 points_valid(lon, lat, degrees::Bool=true) =
     degrees ? !any(abs.(lat) .> 90.) : !any(abs.(lat) .> pi/2.)
+
+"""
+    geodesic_endpoint(lon, lat, az, delta, degrees::Bool=true) -> lon1, lat1
+
+Compute the end point (`lon1`, `lat1`) reached by travelling on the sphere along
+azimuth `az` for `delta` angular distance.  Points, angles and distance are read
+and returned in degrees by default; use `degrees=false` for radians.
+"""
+function geodesic_endpoint(lon, lat, az, delta, degrees::Bool=true)
+    if degrees
+        lon, lat, az, delta = deg2rad(lon), deg2rad(lat), deg2rad(az), deg2rad(delta)
+    end
+    lat2 = asin(sin(lat)*cos(delta) + cos(lat)*sin(delta)*cos(az))
+    lon2 = lon + atan(sin(az)*sin(delta)*cos(lat),
+                      cos(delta)-sin(lat)*sin(lat2))
+    if degrees
+        lon2, lat2 = rad2deg(lon2), rad2deg(lat2)
+    end
+    lon2, lat2
+end
