@@ -9,13 +9,20 @@ FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 Geodesics = "6aaf26a4-c633-11e8-35ae-8904cb805353"
 Geodesy = "0ef565a4-170c-5f04-8de2-149903a85f3d"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-SAC = "03de775e-c638-11e8-38ea-6915ef5cdf5f"
 Seis = "dd80f4d8-c2f6-58bd-9bd3-4635f134261d"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
+[compat]
+DSP = "0.6"
+FFTW = "1"
+Geodesics = "0.2"
+Geodesy = "0.5"
+RecipesBase = "0.7, 0.8"
+Seis = "0.3"
+
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "DelimitedFiles"]
