@@ -4,4 +4,5 @@ using Test
 @testset "All tests" begin
     include("fk.jl")
     include("stack.jl")
+    include("synth.jl")
 end
