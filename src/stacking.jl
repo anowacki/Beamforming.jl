@@ -54,6 +54,50 @@ beamform(s::TraceArray, t1, t2, smax, ds; kwargs...) =
     beamform(s, t1, t2, -smax, smax, -smax, smax, ds; kwargs...)
 
 """
+    vespagram(traces::AbstractVector{<:Seis.Trace}, t1, t2, s1, s2, ds; kwargs...) -> vesp::VespaGrid
+
+Create a vespagram for a set of `traces`, between times `t1` and `t2` seconds,
+and for the range of slownesses from `s1` to `s2` s/° in steps of `ds`
+s/°.
+
+## Keyword arguments
+- `maxima=1`: The top `maxima` points with the highest beam power are saved to the
+  `VespaGrid` returned.
+- `method=:linear`: Set the stacking method to use.  See [`stack`](@ref) for available
+  stacking methods.
+- `n`: Power of the nth-root or phase-weighted stack.
+- `wavefront=:plane`: Geometry of problem to consider.  If `:plane`, consider
+  a plane wave moving across the array.  If `circle`, assumes a circular wavefront
+  with backazimuth and absolute slowness determined by the slowness grid points.
+- `envelope=false`: Whether or not to stack the envelopes of traces
+"""
+function vespagram(s::TraceArray{T}, t1, t2, s1, s2, ds;
+        maxima=1, method=:linear, n=nothing, envelope=false, wavefront=:plane) where T
+    slow = s_per_km.(s1:ds:s2)
+    t = t1:first(s).delta:t2
+    nslow = length(slow)
+    nt = length(t)
+    vespa = Array{T}(undef, nt, nslow)
+    lon, lat = s.sta.lon, s.sta.lat
+    evt = first(s).evt
+    x, y, z, mean_lon, mean_lat = array_geometry(lon, lat, zeros(length(s)))
+    Δ̄ = wavefront === :circle ? delta(mean_lon, mean_lat, evt.lon, evt.lat) : nothing
+    ᾱ = Geodesics.azimuth(mean_lon, mean_lat, evt.lon, evt.lat) #+ 180
+    for (i, islow) in enumerate(slow)
+        sx, sy = islow.*sincos(deg2rad(ᾱ))
+        align = shift_times(x, y, sx, sy, wavefront; lon=lon, lat=lat,
+            mean_lon=mean_lon, mean_lat=mean_lat, mean_dist=Δ̄)
+        S = stack(s, (t1, t2), align; method=method, n=n)
+        envelope && (Seis.envelope!(S))
+        vespa[:,i] .= Seis.trace(S)
+    end
+    slow = s_per_degree(slow)
+    t_max, slow_max, _, _ = find_maxima(t, slow, vespa, maxima)
+    VespaGrid{T,eltype(s)}(mean_lon, mean_lat, x, y, t, slow, vespa,
+        maxima, t_max, slow_max, s, method, n, wavefront, envelope)
+end
+
+"""
     shift_times(x, y, sx, sy, wavefront=:plane; kwargs...) -> shifts::Vector
 
 Compute a set of shift times in s, `shifts`, which represent the relative

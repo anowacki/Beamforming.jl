@@ -1,4 +1,4 @@
-# Recipes for beamforming grids and ARFs
+# Recipes for beamforming grids, vespagrams and ARFs
 
 using RecipesBase: RecipesBase, @recipe, @series
 
@@ -118,6 +118,79 @@ end
     end
 end
 
+@recipe function f(vespa::VespaGrid; phases=[], model="iasp91", normalise=true)
+    xlim --> extrema(vespa.time)
+    ylim --> extrema(vespa.slow)
+    framestyle --> :box
+    maxamp = maximum(abs, vespa.power)
+    clims --> (normalise ? (-1, 1) : (-maxamp, maxamp))
+    grid = normalise ? vespa.power' ./ maxamp : vespa.power'
+    xlabel --> "Time / s"
+    ylabel --> "Slowness / s/°"
+    plot_title = (normalise ? "Normalised v" : "V") * "espagram " *
+        (vespa. envelope ? "envelope" : "amplitude")
+    title --> (vespa.envelope ? "Vespagram envelope" : "Vespagram amplitude")
+    @series begin
+        seriestype := :heatmap
+        seriescolor --> (vespa.envelope ? :lightrainbow : :RdBu)
+        vespa.time, vespa.slow, grid
+    end
+    # 1D phase annotations, if event information is present
+    phases = phases isa Union{Tuple,AbstractArray} ? phases : (phases,)
+    phases_x, phases_y = Float64[], Float64[]
+    phase_annotations = String[]
+    if !isempty(phases)
+        ! _hastraces(vespa) && error("beamforming object does not contain traces, " *
+                                     "which are needed to add phase arrivals")
+        evt = vespa.traces[1].evt
+        for phase in phases
+            # FIXME: Find a better way to conditionally calculate this depening
+            # on whether SeisTau is loaded
+            try
+                arr = Main.SeisTau.travel_time(first(vespa.traces), phase, model=model)
+                isempty(arr) && continue
+                dtdd = first(arr).dtdd
+                tt = first(arr).time
+                push!(phases_x, tt)
+                push!(phases_y, dtdd)
+                push!(phase_annotations, phase)
+            catch err
+                if err isa UndefVarError && err.var == :SeisTau
+                    @warn("SeisTau is not loaded; no phase arrivals plotted.  " *
+                          "To add phase arrivals, do `using SeisTau`, then " *
+                          "try this plotting command again.")
+                else
+                    rethrow(err)
+                end
+            end
+        end
+    end
+
+    # Phase location
+    @series begin
+        seriestype := :scatter
+        markercolor --> :white
+        markersize --> 4
+        markershape --> :square
+        markerstrokecolor --> :black
+        markerstrokewidth --> 2
+        label := ""
+        phases_x, phases_y
+    end
+
+    # Phase label
+    @series begin
+        seriestype := :scatter
+        primary := false
+        markersize := 0
+        label := ""
+        # FIXME: Find a better way to set font properties
+        series_annotations := Main.Plots.series_annotations(phase_annotations,
+            Main.Plots.font("Helvetica", 9, :left, :bottom))
+        phases_x, phases_y
+    end
+end
+
 """
     plot(beamform_grid; kwargs...) -> ::Plot
 
@@ -131,6 +204,16 @@ Create a plot of a [`BeamformGrid`](@ref), as created by [`beamform`](@ref).
   `:log10` and `:dB`.
 - `dazimuth = 30`: Spacing of constant-azimuth lines on plot in °.
 - `dslowness` = 2: Spacing of constant-slowness lines on plot in s/°.
+
+---
+
+    plot(vespagram_grid; phases=[], model="iasp91") -> ::Plot
+
+Create a plot of a vespagram computed by [`vespagram`](@ref).
+
+Optionally provide a `Vector` of phases to plot.  Before using this option,
+you must have imported `SeisTau`.  Specfiy the model for predicted
+slownesses and travel times with `model`.
 
 ---
 

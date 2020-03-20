@@ -44,7 +44,7 @@ struct BeamformGrid{T, S<:Seis.Trace}
 end
 
 "Return `true` if a `BeamformGrid` contains the traces used to construct it"
-_hastraces(bf::BeamformGrid) = length(bf.traces) > 0
+_hastraces(bf::BeamformGrid) = !isempty(bf.traces)
 
 """
     ArrayResponse{T}
@@ -69,3 +69,46 @@ struct ArrayResponse{T}
     "Power of array response at each (sx, sy) point"
     power::Array{T,2}
 end
+
+"""
+    VespaGrid{T, S<:Seis.Trace}
+
+Struct containing the results of vespagram analysis.
+
+This can be plotted using [`Plots.plot`](@ref).
+"""
+struct VespaGrid{T, S<:Seis.Trace}
+    "Reference longitude in ° of array"
+    lon::T
+    "Reference latitude in ° array"
+    lat::T
+    "Cartesian x-coordinates of each station (km)"
+    x::Vector{T}
+    "Cartesian y-coordinates of each station"
+    y::Vector{T}
+    "Stacking times (s)"
+    time::Vector{T}
+    "Slownesses (s/°)"
+    slow::Vector{T}
+    "Beam power at each (time, slow) point"
+    power::Array{T,2}
+    "Number of maxima identified"
+    nmax::Int
+    "Times of nmax maxima"
+    t_max::Vector{T}
+    "Slownesses of nmax maxima"
+    s_max::Vector{T}
+    "Input traces.  May be empty."
+    traces::Vector{S}
+    "Stacking method (e.g., :linear, :nthroot, :phaseweight)"
+    method::Symbol
+    "Order of stack (e.g. in nthroot or phaseweighted stacking)"
+    n::Union{Nothing,Int}
+    "Stacking wavefront type (e.g., :plane, :circle)"
+    wavefront::Symbol
+    "Whether vespagram is an envelope stack"
+    envelope::Bool
+end
+
+"Return `true` if a `BeamformGrid` contains the traces used to construct it"
+_hastraces(vesp::VespaGrid) = !isempty(vesp.traces)

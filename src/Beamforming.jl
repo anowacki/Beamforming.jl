@@ -13,7 +13,8 @@ import Seis, Geodesics
 export
     array_response,
     beamform,
-    stack
+    stack,
+    vespagram
 
 # Custom type aliases
 const TraceArray{T} = AbstractArray{<:Seis.Trace{T}}
