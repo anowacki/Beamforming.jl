@@ -64,7 +64,9 @@ uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
 version = "3.3.9+4"
 
 [[Geodesics]]
-path = "/Users/nowacki/Applications/julia_pkgs/Geodesics"
+git-tree-sha1 = "87f17cffaddf24f9844674707c9026c4746c1277"
+repo-rev = "master"
+repo-url = "https://github.com/anowacki/Geodesics.jl"
 uuid = "6aaf26a4-c633-11e8-35ae-8904cb805353"
 version = "0.2.2"
 
@@ -183,7 +185,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[Seis]]
 deps = ["DSP", "Dates", "Geodesics", "Glob", "LinearAlgebra", "MacroTools", "RecipesBase", "Statistics"]
-path = "/Users/nowacki/Work/Projects/Seis.jl"
+git-tree-sha1 = "4057e6f0f40e07e7fce176222a6efab7bc857851"
+repo-rev = "master"
+repo-url = "https://github.com/anowacki/Seis.jl"
 uuid = "dd80f4d8-c2f6-58bd-9bd3-4635f134261d"
 version = "0.3.0"
 
