@@ -48,7 +48,7 @@ function synthetic_arrival(sx, sy;
 
     # Add event if requested
     evt = Seis.Event{eltype(s[1])}()
-    if !isnothing(distance)
+    if distance !== nothing
         β = atand(sx, sy)
         evt.lon, evt.lat, _ = Geodesics.angular_step(mlon, mlat, β,
             distance, true)

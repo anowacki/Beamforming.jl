@@ -119,7 +119,7 @@ function shift_times(x, y, sx, sy, wavefront=:plane;
     if wavefront === :plane
         -(x.*sx .+ y.*sy)
     elseif wavefront === :circle
-        any(isnothing, (lon, lat, mean_lon, mean_lat, mean_dist)) &&
+        any(x -> x===nothing, (lon, lat, mean_lon, mean_lat, mean_dist)) &&
             throw(ArgumentError("lon, lat, mean_lon, mean_lat and mean_dist " *
                                 "must be given when `wavefront` is `:circle`"))
         s = sqrt(sx^2 + sy^2) # s/km
