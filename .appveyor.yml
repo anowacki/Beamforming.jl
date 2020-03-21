@@ -31,7 +31,7 @@ install:
 build_script:
   - echo "%JL_BUILD_SCRIPT%"
   - C:\julia\bin\julia -e "%JL_BUILD_SCRIPT%"
-  - C:\julia\bin\julia -e 'import Pkg; pkg"add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl"'
+  - C:\julia\bin\julia -e 'import Pkg; Pkg.pkg"add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl"'
 
 test_script:
   - echo "%JL_TEST_SCRIPT%"

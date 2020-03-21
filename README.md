@@ -5,6 +5,8 @@ data, using [Seis.jl](https://github.com/anowacki/Seis.jl).
 
 ## Build status
 [![Build Status](https://travis-ci.org/anowacki/Beamforming.jl.svg?branch=master)](https://travis-ci.org/anowacki/Beamforming.jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/voywfa1yu2f72fuk/branch/master?svg=true)](https://ci.appveyor.com/project/AndyNowacki/beamforming-jl/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/anowacki/Beamforming.jl/badge.svg?branch=master)](https://coveralls.io/github/anowacki/Beamforming.jl?branch=master)
 
 
 ## Installation
