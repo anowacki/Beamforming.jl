@@ -16,3 +16,7 @@ jobs:
     - julia: nightly
 
 coveralls: true
+
+before_install:
+  - julia -e 'import Pkg; pkg"add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl"'
+  

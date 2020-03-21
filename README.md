@@ -3,6 +3,10 @@
 Beamforming is a Julia module for the array analysis of seismic
 data, using [Seis.jl](https://github.com/anowacki/Seis.jl).
 
+## Build status
+[![Build Status](https://travis-ci.org/anowacki/Beamforming.jl.svg?branch=master)](https://travis-ci.org/anowacki/Beamforming.jl)
+
+
 ## Installation
 
 ```julia
