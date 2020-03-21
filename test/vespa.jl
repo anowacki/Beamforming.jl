@@ -6,7 +6,7 @@ using Beamforming, Beamforming.Synth
 @testset "Vespagrams" begin
     let slow = 10rand(), baz = 360rand(), maxima = rand(1:5), Δ = 100,
             wavefront = :plane, envelope = false
-        sx, sy = slow.*sincosd(baz)
+        sx, sy = slow.*(sind(baz), cosd(baz))
         s = Synth.synthetic_arrival(sx, sy, distance=Δ, noise=0.001)
         nsta = length(s)
         for (method, n) in zip((:linear, :nthroot, :phaseweight), (nothing, 3, 3))
