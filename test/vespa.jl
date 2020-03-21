@@ -23,7 +23,7 @@ using Beamforming, Beamforming.Synth
             @test vespa.envelope == envelope
             @test vespa.wavefront == wavefront
             @test vespa.s_max[1] ≈ slow atol=0.2
-            @test vespa.t_max[1] ≈ 50 atol=10s[1].delta
+            @test vespa.t_max[1] ≈ 50 atol=15s[1].delta
         end
     end
 end
