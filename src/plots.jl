@@ -3,8 +3,8 @@
 using RecipesBase: RecipesBase, @recipe, @series
 
 @recipe function f(bf::BeamformGrid; phases=[], model="iasp91", powscale=:linear, dazimuth=30, dslowness=2)
-    xlim --> extrema(bf.sx)
-    ylim --> extrema(bf.sy)
+    xlims --> extrema(bf.sx)
+    ylims --> extrema(bf.sy)
     aspect_ratio --> :equal
     framestyle --> :box
     title --> "Normalised beam power"
@@ -107,8 +107,8 @@ using RecipesBase: RecipesBase, @recipe, @series
 end
 
 @recipe function f(arf::ArrayResponse)
-    xlim --> extrema(arf.sx)
-    ylim --> extrema(arf.sy)
+    xlims --> extrema(arf.sx)
+    ylims --> extrema(arf.sy)
     aspect_ratio --> :equal
     framestyle --> :box
     @series begin
@@ -119,8 +119,8 @@ end
 end
 
 @recipe function f(vespa::VespaGrid; phases=[], model="iasp91", normalise=true)
-    xlim --> extrema(vespa.time)
-    ylim --> extrema(vespa.slow)
+    xlims --> extrema(vespa.time)
+    ylims --> extrema(vespa.slow)
     framestyle --> :box
     maxamp = maximum(abs, vespa.power)
     clims --> (normalise ? (-1, 1) : (-maxamp, maxamp))
