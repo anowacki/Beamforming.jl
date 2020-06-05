@@ -17,7 +17,7 @@ DSP = "0.6"
 FFTW = "1"
 Geodesics = "0.2"
 Geodesy = "0.5"
-RecipesBase = "0.7, 0.8"
+RecipesBase = "0.7, 0.8, 1"
 Seis = "0.3"
 julia = "1"
 
