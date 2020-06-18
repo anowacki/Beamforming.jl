@@ -44,6 +44,7 @@ function synthetic_arrival(sx, sy;
     s = [Seis.Trace(0, delta, data) for _ in 1:nsta]
     s.sta.lon = lon
     s.sta.lat = lat
+    s.sta.sta = string.(1:nsta)
     mlon, mlat = mean(lon), mean(lat)
 
     # Add event if requested
