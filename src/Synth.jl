@@ -22,11 +22,12 @@ Optionally specify the number of stations `nsta`, the trace sampling interval
 `delta` s and the station coordinates `lon`° and `lat`°.
 
 If `distance` is not `nothing`, then populate the traces' event info with
-the coordinates of the event.  Specify the level of Gaussian `noise`
+the coordinates of the event.  Specify the 2σ amplitude of Gaussian `noise`
 to add to the trace as a value greater than 0.
 """
 function synthetic_arrival(sx, sy;
         delta = 0.01,
+        nsamples = 10_000,
         nsta = 20,
         lon = 5rand(nsta) .- 2.5,
         lat = 5rand(nsta) .- 2.5,
@@ -34,7 +35,8 @@ function synthetic_arrival(sx, sy;
         noise = 0.0
         )
     # Synthetic arrival
-    data = exp.(-(-50:0.01:50).^2 ./ 0.01)
+    tmax = nsamples*0.01/2
+    data = exp.(-(-tmax:0.01:tmax).^2 ./ 0.01)
     maxamp = maximum(data)
     # Add noise
     if noise > 0
