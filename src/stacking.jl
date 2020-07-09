@@ -34,9 +34,6 @@ function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds;
     x, y, z, mean_lon, mean_lat = array_geometry(lon, lat, zeros(length(s)))
     Δ̄ = wavefront === :circle ? delta(mean_lon, mean_lat, evt.lon, evt.lat) : nothing
     for (iy, isy) in enumerate(sy), (ix, isx) in enumerate(sx)
-    # Threads.@threads for iy in eachindex(sy)
-    #     isy = sy[iy]
-    #     for (ix, isx) in enumerate(sx)
         align = shift_times(x, y, isx, isy, wavefront;
             lon=lon, lat=lat, mean_lon=mean_lon, mean_lat=mean_lat, mean_dist=Δ̄)
         S = stack(s, (t1,t2), align; method=method, n=n)
@@ -60,7 +57,7 @@ Create a vespagram for a set of `traces`, between times `t1` and `t2` seconds,
 and for the range of slownesses from `s1` to `s2` s/° in steps of `ds`
 s/°.
 
-## Keyword arguments
+# Keyword arguments
 - `maxima=1`: The top `maxima` points with the highest beam power are saved to the
   `VespaGrid` returned.
 - `method=:linear`: Set the stacking method to use.  See [`stack`](@ref) for available
@@ -105,12 +102,12 @@ time at which a wavefront travelling at x-slowness `sx`  and y-slowness `sy` s/k
 occurs at each point in space `x` and `y` km.  By default, a plane wave is assumed;
 set `wavefront=:circle` to use a circular wavefront.
 
-## Keyword arguments
-### Required if `wavefront == :circle`:
-- `lon = lat = nothing`: The longitude and latitude (°) of each station.
+# Keyword arguments
+## Required if `wavefront == :circle`:
+- `lon, lat`: The longitude and latitude (°) of each station.
 - `mean_lon, mean_lat`: Reference longitude and latitude (°) of the array
 - `mean_dist`: Distance from event to reference point
-### Optional if `wavefront == :circle`:
+## Optional if `wavefront == :circle`:
 - `earth_radius = $(R_EARTH_KM_DEFAULT)`: Planetary radius in km
 """
 function shift_times(x, y, sx, sy, wavefront=:plane;
@@ -139,17 +136,22 @@ end
 
 """
     array_geometry(lon, lat, alt) -> easting, northing, elevation, mean_lon, mean_lat
-    array_geometry(s::AbstractArray{Seis.Trace}) -> easting, northing, elevation, mean_lon, mean_lat
+    array_geometry(traces::AbstractArray{Seis.Trace}) -> easting, northing, elevation, mean_lon, mean_lat
+    array_geometry(stations::AbstractArray{Seis.Station}) -> easting, northing, elevation, missing, missing
 
 Return the local `easting` and `northing` in km of each station in the array `s` in
 a transverse Mercator transform, relative to the centre of the array.  The longitude
 and latitude of the array centre are given by `mean_lon` and `mean_lat` (°) respectively.
 
-`lon` and `lat` should be in ° and `alt` in m.  Or provide an array of `Seis.Trace`s.
+`lon` and `lat` should be in ° and `alt` in m.  Or provide an array of `Seis.Trace`s
+or `Seis.Station`s.  If `traces` or `stations` is an array of `CartTrace` or
+`CartStation`s, then no mean longitude or latitude are calculated and instead
+they are returned as `nothing`.
 """
 function array_geometry(lon, lat, alt)
+    T = eltype(lon)
     length(lon) == length(lat) == length(alt) ||
-        throw(ArgumentError("`lon` and `lat` must be the same length"))
+        throw(DimensionMismatch("`lon` and `lat` must be the same length"))
     # Find spherical mean of the array, ignoring altitude
     x, y, z = geog2cart(lon, lat, true)
     X, Y, Z = Float64.(sum.((x, y, z)))
@@ -158,19 +160,35 @@ function array_geometry(lon, lat, alt)
     origin = Geodesy.LLA(mean_lat, mean_lon, zero(eltype(lat)))
     transform = Geodesy.ENUfromLLA(origin, Geodesy.wgs84)
     # Do the transform.  x and y are in metres
-    x = Array{Float64}(undef, length(lon))
+    x = Array{T}(undef, length(lon))
     y = similar(x)
     z = similar(x)
     for (i, (lo, la, al)) in enumerate(zip(lon, lat, alt))
         p = transform(Geodesy.LLA(la, lo, al))
-        x[i] = p.e
-        y[i] = p.n
-        z[i] = p.u
+        x[i] = p.e/1e3
+        y[i] = p.n/1e3
+        z[i] = p.u/1e3
     end
-    x./1e3, y./1e3, z./1e3, mean_lon, mean_lat
+    x, y, z, mean_lon, mean_lat
 end
-array_geometry(s::TraceArray{T}) where T = array_geometry(s.sta.lon, s.sta.lat,
-    [ismissing(ss.sta.elev) ? zero(T) : ss.sta.elev for ss in s])
+
+array_geometry(s::TraceArray) = array_geometry(s.sta)
+
+array_geometry(stas::AbstractArray{<:Seis.GeogStation{T}}) where T =
+    array_geometry(stas.lon, stas.lat, coalesce.(stas.elev, zero(T)))
+
+function array_geometry(stas::AbstractArray{<:Seis.CartStation{T}}) where T
+    to_km = T(0.001)
+    xx = stas.x
+    yy = stas.y
+    zz = stas.z
+    any(x -> x[1] === missing || x[2] === missing, zip(xx, yy)) &&
+        throw(ArgumentError("all stations must have both x and y coordinates"))
+    x = to_km*(xx .- mean(xx))
+    y = to_km*(yy .- mean(yy))
+    z = to_km*coalesce.((zz .- mean(zz)), zero(T))
+    x, y, z, nothing, nothing
+end
 
 """
     array_centre(lon, lat) -> midlon, midlat
@@ -180,7 +198,7 @@ Return the mean location of the array in spherical coordinates.
 """
 function array_centre(lon, lat)
     length(lon) == length(lat) ||
-        throw(ArgumentError("`lon` and `lat` must be the same length"))
+        throw(DimensionMismatch("`lon` and `lat` must be the same length"))
     x, y, z = geog2cart(lon, lat, true)
     X, Y, Z = sum.((x, y, z))
     mlon, mlat, r = cart2geog(X, Y, Z, true)
@@ -191,12 +209,12 @@ array_centre(s::TraceArray) = array_centre(s.sta.lon, s.sta.lat)
 """
     array_response(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg=false) -> arf::ArrayResponse
     array_response(x, y, smax, ds, f1, f2, df, s_deg=false) -> arf::ArrayResponse
-    array_response(traces::Array{Seis.Trace}, args...) -> arf::ArrayResponse
+    array_response(traces::Array{<:Seis.Trace}, args...) -> arf::ArrayResponse
+    array_response(stations::Array{<:Seis.Station}, args...) -> arf
 
-Return the array response function `arf.power` (an [`ArrayResponse`]@ref) at
+Return the array response function `arf.power` (an [`ArrayResponse`](@ref)) at
 slownesses with east and north components `arf.sx` and `arf.sy` respectively,
-in s/km.  The ARF is computed between
-frequencies `f1` and `f2` Hz, spaced by `df` Hz.
+in s/km.  The ARF is computed between frequencies `f1` and `f2` Hz, spaced by `df` Hz.
 
 Provide either explicit limits on slowness `(sx1, sx2)` and `(sy1, sy2)` in the
 east and north components respectively, or the maximum slowness `smax`,
@@ -206,41 +224,40 @@ plus the slowness spacing `ds`.
 can be given.
 
 Default input units of slowness are s/km.  Give `s_deg` as `true`
-to use s/°.
+to use s/°.  Note that values in `arf` are always given in s/km.
 """
 function array_response(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df, s_deg=false)
-    slowx = sx1:ds:sx2
-    slowy = sy1:ds:sy2
-    s_deg && ((slowx, slowy) = s_per_km.((slowx, slowy)))
-    f = f1:df:f2
-    arf = zeros(length(slowx), length(slowy))
-    _compute_arf!(arf, x, y, slowx, slowy, f)
-    ((slowx, slowy) = s_per_degree.((slowx, slowy)))
-    ArrayResponse(f, x, y, slowx, slowy, arf)
+    if s_deg
+        sx1, sx2, sy1, sy2, ds = s_per_km.((sx1, sx2, sy1, sy2, ds))
+    end
+    arf = ArrayResponse{eltype(x)}(x, y, sx1, sx2, sy1, sy2, ds, f1, f2, df)
+    _compute_arf!(arf)
 end
+
 array_response(x, y, smax, ds, f1, f2, df, s_deg::Bool=false) =
     array_response(x, y, -smax, smax, -smax, smax, ds, f1, f2, df, s_deg)
+array_response(s::AbstractArray{<:Seis.Station}, args...) =
+    array_response(array_geometry(s)[1:2]..., args...)
 array_response(s::TraceArray, args...) =
     array_response(array_geometry(s)[1:2]..., args...)
 
-"""    _compute_arf!(arf, x, y, sx, sy, f)
+"""
+    _compute_arf!(arf)
 
-Compute the array response function `arf` at indices `[ix,iy]`, where `ix` and
-`iy` refer to the slownesses `sx[ix]` and `sy[iy]` (s/km).  Integrate over the
-frequencies (Hz) in `f`.  `x` and `y` are the station locations (km)."""
-function _compute_arf!(arf::AbstractArray{T,2} where T, x, y, sx, sy, f)
-    length(x) == length(y) && size(arf) == (length(sx), length(sy)) ||
-        throw(ArgumentError("Array sizes do not match"))
-    @inbounds for (j, slowy) in enumerate(sy), (i, slowx) in enumerate(sx)
-        for k in 1:length(f)
-            sum = 0.0im
-            @simd for istat in 1:length(x)
-                sum += exp((slowx.*x[istat] + slowy.*y[istat])*2π*f[k]*im)
+Do the actual ARF calculation for an `ArrayResponse`.
+"""
+function _compute_arf!(arf::ArrayResponse{T}) where T
+    @inbounds for (j, slowy) in enumerate(arf.sy), (i, slowx) in enumerate(arf.sx)
+        for f in arf.freqs
+            ω = T(2)*π*f
+            pow = zero(T)*im
+            @simd for istat in 1:length(arf.x)
+                pow += cis(ω*(slowx*arf.x[istat] + slowy*arf.y[istat]))
             end
-            arf[i,j] += abs(sum)^2
+            arf.power[i,j] += abs2(pow)
         end
     end
-    nothing
+    arf
 end
 
 """

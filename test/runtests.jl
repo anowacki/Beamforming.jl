@@ -6,4 +6,5 @@ using Test
     include("stack.jl")
     include("vespa.jl")
     include("synth.jl")
+    include("arf.jl")
 end
