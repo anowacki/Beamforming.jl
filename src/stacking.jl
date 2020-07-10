@@ -99,7 +99,7 @@ Find `n` maxima in the beam power grid `power`, and return vectors
 of `sx_max`, `sy_max`, `slowness` and `backazimuth` for each.
 """
 function find_maxima(sx, sy, power::AbstractArray{T,2}, n=1) where T
-    inds = sortperm(view(power, 1:length(power)), rev=true)
+    inds = sortperm(vec(power), rev=true)
     sx_max, sy_max, p, β = T[], T[], T[], T[]
     for i in 1:n
         ix, iy = Tuple(CartesianIndices(power)[inds[i]])
