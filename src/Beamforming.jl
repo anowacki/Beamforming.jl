@@ -34,9 +34,12 @@ const VERBOSE = Ref(true)
 verbose(tf::Bool) = VERBOSE[] = tf
 
 include("types.jl")
+include("util.jl")
 include("sphericalgeom.jl")
 include("stacking.jl")
+include("beamform.jl")
 include("correlation.jl")
+include("array_response.jl")
 include("plots.jl")
 
 # Submodules
