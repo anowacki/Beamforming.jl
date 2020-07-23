@@ -61,6 +61,8 @@ julia> bf.sx_max[1], bf.sy_max[1] # Maximum power slowness points in x and y
   Cross-correlation beamforming.
   Journal of Seismology 21, 495–508.
   https://doi.org/10.1007/s10950-016-9612-6
+
+See also [`crosscorrelation_beamform_corrs`](@ref).
 """
 function crosscorrelation_beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds;
         t=(t2-t1)/2, kwargs...) where T
