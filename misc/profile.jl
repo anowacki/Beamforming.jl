@@ -7,12 +7,12 @@ using Plots
 
 Beamforming.verbose(false)
 
-function f()
+function f(; kwargs...)
     t = Seis.sample_data(:array)
-    Beamforming.beamform(t, 1110, 1140, 6, 0.25)
+    Beamforming.beamform(t, 1110, 1140, 6, 0.25; kwargs...)
 end
 
-Juno.@profiler f()
+Juno.@profiler f(; method=:phaseweight, n=3)
 @time fk = f()
 
 heatmap(fk.sx, fk.sy, fk.power', aspect_ratio=:equal,

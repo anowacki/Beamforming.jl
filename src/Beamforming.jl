@@ -6,6 +6,8 @@ and compute array response functions using `array_response_function`.
 """
 module Beamforming
 
+using Statistics: mean
+
 import DSP, Geodesy
 
 import Seis, Geodesics
@@ -13,6 +15,9 @@ import Seis, Geodesics
 export
     array_response,
     beamform,
+    crosscorrelation_array_response,
+    crosscorrelation_beamform,
+    crosscorrelation_beamform_corrs,
     stack,
     vespagram
 
@@ -29,8 +34,12 @@ const VERBOSE = Ref(true)
 verbose(tf::Bool) = VERBOSE[] = tf
 
 include("types.jl")
+include("util.jl")
 include("sphericalgeom.jl")
 include("stacking.jl")
+include("beamform.jl")
+include("correlation.jl")
+include("array_response.jl")
 include("plots.jl")
 
 # Submodules

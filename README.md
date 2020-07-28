@@ -14,18 +14,22 @@ data, using [Seis.jl](https://github.com/anowacki/Seis.jl).
 ```julia
 julia> ] # press ']' to enter pkg mode
 
-(v1.3) pkg> add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl https://github.com/anowacki/Beamforming.jl
+(v1.4) pkg> add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl https://github.com/anowacki/Beamforming.jl
 ```
 
 ## Using
 
 The main functions exported are:
 
-- `array_response`: Compute the array response function for a set
-  of stations
-- `beamform`: Compute the beam power across a grid of slowness points
-  (as in f–k analysis)
-- `vespagram`: Compute a slowness vespagram
+- For traditional beamforming:
+  - `array_response`: Compute the array response function for a set
+    of stations
+  - `beamform`: Compute the beam power across a grid of slowness points
+    (as in f–k analysis)
+  - `vespagram`: Compute a slowness vespagram
+- For cross-correlation beamforming:
+  - `crosscorrelation_array_response`
+  - `crosscorrelation_beamform`
 
 If you install [Plots.jl](https://github.com/JuliaPlots/Plots.jl),
 then you can visualise the output of each of these functions
