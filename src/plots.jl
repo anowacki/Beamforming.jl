@@ -158,10 +158,10 @@ end
     maxamp = maximum(abs, vespa.power)
     clims --> (normalise ? (-1, 1) : (-maxamp, maxamp))
     grid = normalise ? vespa.power' ./ maxamp : vespa.power'
-    xlabel --> "Time / s"
-    ylabel --> "Slowness / s/°"
+    xguide --> "Time / s"
+    yguide --> "Slowness / s/°"
     plot_title = (normalise ? "Normalised v" : "V") * "espagram " *
-        (vespa. envelope ? "envelope" : "amplitude")
+        (vespa.envelope ? "envelope" : "amplitude")
     title --> (vespa.envelope ? "Vespagram envelope" : "Vespagram amplitude")
     @series begin
         seriestype := :heatmap
