@@ -60,9 +60,9 @@ using Seis
             csarf = array_response(cstas, s_max, ds, f1, f2, df)
             @test carf == csarf
 
-            @test arf.sx == -s_max:ds:s_max
-            @test arf.sy == -s_max:ds:s_max
-            @test arf.freqs == f1:df:f2
+            @test arf.sx == T.(-s_max:ds:s_max)
+            @test arf.sy == T.(-s_max:ds:s_max)
+            @test arf.freqs == T.(f1:df:f2)
             @test arf.x == x
             @test arf.y == y
         end
