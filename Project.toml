@@ -1,7 +1,7 @@
 name = "Beamforming"
 uuid = "bdfe4746-bf38-11e9-1e2c-db8d7c02fe8b"
 authors = ["Andy Nowacki <a.nowacki@leeds.ac.uk>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
