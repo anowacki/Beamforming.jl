@@ -17,6 +17,8 @@ julia> ] # press ']' to enter pkg mode
 (v1.4) pkg> add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl https://github.com/anowacki/Beamforming.jl
 ```
 
+Beamforming.jl requires Julia v1.6 or above.
+
 ## Usage overview
 
 The main functions exported are:
