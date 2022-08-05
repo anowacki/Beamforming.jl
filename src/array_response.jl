@@ -43,7 +43,7 @@ function _compute_arf!(arf::ArrayResponse{T}) where T
         for f in arf.freqs
             ω = T(2)*π*f
             pow = zero(T)*im
-            @simd for istat in 1:length(arf.x)
+            @simd for istat in eachindex(arf.x, arf.y)
                 pow += cis(ω*(slowx*arf.x[istat] + slowy*arf.y[istat]))
             end
             arf.power[i,j] += abs2(pow)

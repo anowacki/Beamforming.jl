@@ -6,11 +6,13 @@ and compute array response functions using `array_response_function`.
 """
 module Beamforming
 
+import DSP
+import Geodesics
+import Geodesy
+import Seis
+
 using Statistics: mean
 
-import DSP, Geodesy
-
-import Seis, Geodesics
 
 export
     array_response,

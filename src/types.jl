@@ -98,15 +98,15 @@ This can be plotted using [`Plots.plot`](@ref).
 """
 struct ArrayResponse{T} <: AbstractArrayResponse
     "Frequencies at which the array response was evaluated (Hz)"
-    freqs
+    freqs::Vector{T}
     "Cartesian x-coordinates in each station (km)"
-    x
+    x::Vector{T}
     "Cartesian y-coordinates in each station (km)"
-    y
+    y::Vector{T}
     "Horizontal slownesses in s/km in x-direction of beamforming grid (first dimension)"
-    sx
+    sx::Vector{T}
     "Horizontal slownesses in s/km in y-direction of beamforming grid (second dimension)"
-    sy
+    sy::Vector{T}
     "Power of array response at each (sx, sy) point"
     power::Array{T,2}
 end
