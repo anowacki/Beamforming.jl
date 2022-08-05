@@ -4,9 +4,9 @@ Beamforming is a Julia module for the array analysis of seismic
 data, using [Seis.jl](https://github.com/anowacki/Seis.jl).
 
 ## Build status
-[![Build Status](https://travis-ci.org/anowacki/Beamforming.jl.svg?branch=master)](https://travis-ci.org/anowacki/Beamforming.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/voywfa1yu2f72fuk/branch/master?svg=true)](https://ci.appveyor.com/project/AndyNowacki/beamforming-jl/branch/master)
-[![Coverage Status](https://coveralls.io/repos/github/anowacki/Beamforming.jl/badge.svg?branch=master)](https://coveralls.io/github/anowacki/Beamforming.jl?branch=master)
+[![Build Status](https://github.com/anowacki/Beamforming.jl/workflows/CI/badge.svg)](https://github.com/anowacki/Beamforming.jl/actions)
+[![codecov](https://codecov.io/gh/anowacki/Beamforming.jl/branch/master/graph/badge.svg?token=d0ePcA1m54)](https://codecov.io/gh/anowacki/Beamforming.jl)
+
 
 
 ## Installation
@@ -14,7 +14,7 @@ data, using [Seis.jl](https://github.com/anowacki/Seis.jl).
 ```julia
 julia> ] # press ']' to enter pkg mode
 
-(v1.4) pkg> add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl https://github.com/anowacki/Beamforming.jl
+(v1.7) pkg> add https://github.com/anowacki/Geodesics.jl https://github.com/anowacki/Seis.jl https://github.com/anowacki/Beamforming.jl
 ```
 
 Beamforming.jl requires Julia v1.6 or above.
