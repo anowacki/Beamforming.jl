@@ -24,6 +24,9 @@ import Seis
 
 using Statistics: mean
 
+@static if VERSION >= v"1.9"
+    import Base.stack
+end
 
 export
     array_response,
