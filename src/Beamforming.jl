@@ -1,8 +1,19 @@
 """
 # Beamforming
 
-Compute beam power for an array of stations using the `beamform` function,
-and compute array response functions using `array_response_function`.
+Stack seismic data in various ways, based on [Seis.jl](https://githib.com/anowacki/Seis.jl).
+
+## Exported functions
+- `array_response`: Compute the array response function for an array.
+- `beamform`: Find the beam power on a grid of slownesses ('beampacking').
+- `stack`: Stack up traces using various methods.
+- `vespagram`: Form a vespagram (slowness–time).
+- The above, but using cross-correlation beamforming:
+  - `crosscorrelation_array_response`: Array response.
+  - `crosscorrelation_beamform`: Compute cross-correlations between traces, then
+    compute beam power on a slowness grid.
+  - `crosscorrelation_beamform_corrs`: Use an existing set of cross-correlations
+    to compute beam power on a slowness grid.
 """
 module Beamforming
 
