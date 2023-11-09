@@ -19,6 +19,7 @@ Geodesics = "0.2"
 Geodesy = "0.5, 1"
 RecipesBase = "0.7, 0.8, 1"
 Seis = "0.3"
+Statistics = "<0.0.1, 1"
 julia = "1.6"
 
 [extras]
