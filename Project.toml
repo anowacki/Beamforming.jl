@@ -13,7 +13,7 @@ Seis = "dd80f4d8-c2f6-58bd-9bd3-4635f134261d"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-DSP = "0.6, 0.7"
+DSP = "0.6, 0.7, 0.8"
 FFTW = "1"
 Geodesics = "0.2"
 Geodesy = "0.5, 1"
