@@ -91,7 +91,7 @@ abstract type AbstractArrayResponse end
     ArrayResponse{T}
 
 Struct containing the array response function for a set of stations.
-Slownesses in an `ArrayResponse` are always in s/°, and coordinates are
+Slownesses in an `ArrayResponse` are always in s/km, and coordinates are
 in km.
 
 This can be plotted using [`Plots.plot`](@ref).
