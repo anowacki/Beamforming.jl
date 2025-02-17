@@ -43,55 +43,84 @@ The array response for a set of stations can be computed like so:
 using Beamforming, Seis
 t = sample_data(:array); # 60 UK stations
 # Array response parameters
-arf = array_response(t,
-                     5,   # Maximum slowness in s/°
-                     0.1, # Slowness grid spacing
-                     0.1, # Minimum frequency in Hz
-                     1,   # Maximum frequency
-                     0.1, # Frequency spacing
-                     true # `true` for s/° slowness; `false` for s/km
-                     )
-plot(arf, powscale=:dB)   # If Plots is installed
+arf = array_response(
+    t,   # Set of traces
+    5,   # Maximum slowness in s/°
+    0.1, # Slowness grid spacing
+    0.1, # Minimum frequency in Hz
+    1,   # Maximum frequency
+    0.1, # Frequency spacing
+    true # `true` for s/° slowness; `false` for s/km
+)
+using CairoMakie
+plot(arf, powscale=:dB)   # If a Makie backend is installed
 ```
-![](doc/images/array_response.svg)
+<img src="doc/images/array_response.png" width="600">
 
 ### Beamforming
 Beamforming can be performed like so:
 ```julia
-bf = beamform(t,
-              1100, # Start time in s
-              1160, # End time in s
-              -1,   # Minimum east slowness in s/°
-              0.5,  # Maximum east slowness
-              0,    # Minimum north slowness
-              4,    # Maximum north slowness
-              0.01  # Slowness spacing
-              )
+bf = beamform(
+    t,
+    1100, # Start time in s
+    1160, # End time in s
+    -1,   # Minimum east slowness in s/°
+    0.5,  # Maximum east slowness
+    0,    # Minimum north slowness
+    4,    # Maximum north slowness
+    0.01  # Slowness spacing
+)
+using SeisTau       # See note below
 plot(bf, phases=["PKiKP", "PKIKP"])
 ```
-![](doc/images/beamforming.svg)
+
+
+<img src="doc/images/beamforming.png" width="300">
 
 ### Vespagrams
 Compute a vespagram like so:
 ```julia
-vesp = vespagram(t,
-                 1110, # Start time in s
-                 1150, # End time
-                 0,    # Minimum slowness in s/°
-                 4,    # Maximum slowness
-                 0.01, # Slowness spacing
-                 )
-plot(vesp, phases=["PKiKP", "PKIKP"], clim=(-1,1))
+vesp = vespagram(
+    t,
+    1110, # Start time in s
+    1150, # End time
+    1,    # Minimum slowness in s/°
+    4,    # Maximum slowness
+    0.01, # Slowness spacing
+)
+plot(vesp, phases=["PKiKP", "PKIKP"])
 ```
-![](doc/images/vespagram.svg)
+<img src="doc/images/vespagram.png" width="600">
 
 ## Optional extras
 
 ### Plotting
+#### Makie.jl
+Plots can be created using the [Makie.jl](https://docs.makie.org/stable/)
+ecosystem.  To enable this, load a [Makie backend](https://docs.makie.org/stable/explanations/backends/backends) module by doing e.g. `using GLMakie` in
+your REPL or module.  You will likely need to add this backend as a package
+to your environment, e.g. by doing `import Pkg; Pkg.add("GLMakie").`
+
+The following plotting functions are provided through Makie:
+- `plot_array_response`
+- `plot_array_response!`
+- `plot_beamfomring`
+- `plot_beamfomring!`
+- `plot_vespagram`
+- `plot_vespagram!`
+
+`Makie.plot` and `Makie.plot!` are overloaded such that
+`plot(arf_or_bf_or_vesp)` and `plot!(axis, arf_or_bf_or_vesp)` will produce
+the right plot, whether the result of `array_response`, `beamform` or
+`vespagram` is passed in, as seen above.
+
+#### Plots.jl
+As an alternative to Makie plotting, Beamforming.jl supports using
+[Plots.jl](https://docs.juliaplots.org/stable/) as a legacy implementation.
 If you have installed Plots to your environment, then you can easily
 create plots as shown above.
 
-For more help on plotting commands provided in this package, call up
+For more help on the Plots.jl plotting commands provided in this package, call up
 the online help for `Beamforming.plot`:
 
 ```julia
