@@ -35,7 +35,35 @@ export
     crosscorrelation_beamform,
     crosscorrelation_beamform_corrs,
     stack,
-    vespagram
+    vespagram,
+    plot_array_response!,
+    plot_array_response,
+    plot_beamforming!,
+    plot_beamforming,
+    plot_vespagram,
+    plot_vespagram!
+
+function __init__()
+    if isdefined(Base.Experimental, :register_error_hint)
+        Base.Experimental.register_error_hint(MethodError) do io, exc, argtypes, kwargs
+            if exc.f in (
+                plot_array_response,
+                plot_array_response!,
+                plot_beamforming,
+                plot_beamforming!,
+                plot_vespagram,
+                plot_vespagram!,
+            )
+                print(
+                    io,
+                    "\nNote: If you have not already, you must first load a Makie " *
+                    "backend such as GLMakie, CairoMakie or WGLMakie before" *
+                    "you can use $(exc.f) to create plots."
+                )
+            end
+        end
+    end
+end
 
 # Custom type aliases
 const TraceArray{T} = AbstractArray{<:Seis.Trace{T}}
@@ -56,6 +84,7 @@ include("stacking.jl")
 include("beamform.jl")
 include("correlation.jl")
 include("array_response.jl")
+include("makie.jl")
 include("plots.jl")
 
 # Submodules
