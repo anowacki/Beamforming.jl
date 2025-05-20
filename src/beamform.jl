@@ -1,32 +1,48 @@
 
 """
-    beamform(s::AbstractVector{Seis.Trace}, t1, t2, sx1, sx2, sy1, sy2, ds; maxima=1, method=:linear, n=1) -> ::BeamformGrid
+    beamform(s::AbstractVector{Seis.Trace}, t1, t2, sx1, sx2, sy1, sy2, ds; kwargs...) -> ::BeamformGrid
 
 Compute normalised beam power at each horizontal slowness point
 `sx1:ds:sx2` × `sy1:ds:sy2` s/°, between times `t1` and `t2` s.  The slowness
 grid is spaced by `ds` s/°.
+If the keyword argument `s_km` is `true`, then all slownesses are in s/km instead.
+
+Note that the returned `BeamformGrid` always stores slownesses internally in
+s/°.
 
 The `maxima` maximum beam power points are set in the returned `BeamformGrid`.
 
-    beamform(s, t1, t2, smax, ds; maxima=1, method=:linear, n=1) -> ::BeamformGrid
+    beamform(s, t1, t2, smax, ds; kwargs...) -> ::BeamformGrid
 
 Use a slowness grid of `-smax:ds:smax` in both dimensions.
 
 # Keyword arguments
 
+- `earth_radius=$R_EARTH_KM_DEFAULT`: Planetary radius in km.  Used for
+  conversion of slowness units between s/km and s/°.
 - `maxima=1`: The top `maxima` points with the highest beam power are saved to the
   `BeamformGrid` returned.
 - `method=:linear`: Set the stacking method to use.  See [`stack`](@ref) for available
   stacking methods.
 - `n`: Power of the nth-root or phase-weighted stack.
+- `s_km=false`: If `true`, all slownesses are in s/km rather than s/°.
 - `wavefront=:plane`: Geometry of problem to consider.  If `:plane`, consider
   a plane wave moving across the array.  If `circle`, assumes a circular wavefront
   with backazimuth and absolute slowness determined by the slowness grid points.
 """
 function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds;
-        maxima=1, method=:linear, n=nothing, wavefront=:plane) where T
-    sx = s_per_km.(sx1:ds:sx2)
-    sy = s_per_km.(sy1:ds:sy2)
+        earth_radius=R_EARTH_KM_DEFAULT,
+        maxima=1,
+        method=:linear,
+        n=nothing,
+        s_km=false,
+        wavefront=:plane
+) where T
+    sx, sy = if s_km
+        sx1:ds:sx2, sy1:ds:sy2
+    else
+        s_per_km.(sx1:ds:sx2, earth_radius), s_per_km.(sy1:ds:sy2, earth_radius)
+    end
     nx, ny = length.((sx, sy))
     beam_power = Array{T}(undef, nx, ny)
     lon, lat = s.sta.lon, s.sta.lat
@@ -40,7 +56,7 @@ function beamform(s::TraceArray{T}, t1, t2, sx1, sx2, sy1, sy2, ds;
         beam_power[ix,iy] = sum(x->x^2, Seis.trace(S))
     # end
     end
-    sx, sy = s_per_degree.(sx), s_per_degree.(sy)
+    sx, sy = s_per_degree.(sx, earth_radius), s_per_degree.(sy, earth_radius)
     sx_max, sy_max, p, β = find_maxima(sx, sy, beam_power, maxima)
     BeamformGrid{T,eltype(s)}(mean_lon, mean_lat, x, y,
         collect(sx1:ds:sx2), collect(sy1:ds:sy2),
