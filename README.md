@@ -104,8 +104,8 @@ to your environment, e.g. by doing `import Pkg; Pkg.add("GLMakie").`
 The following plotting functions are provided through Makie:
 - `plot_array_response`
 - `plot_array_response!`
-- `plot_beamfomring`
-- `plot_beamfomring!`
+- `plot_beamforming`
+- `plot_beamforming!`
 - `plot_vespagram`
 - `plot_vespagram!`
 
