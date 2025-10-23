@@ -115,7 +115,7 @@ end
 const AVAILABLE_STACK_METHODS = (:linear, :nthroot, :phaseweight)
 
 """
-    stack(S::AbstractArray{Seis.Trace}, time_range, align=zeros(length(S)), weight; method=:linear) -> s::Seis.Trace
+    stack(S::AbstractArray{Seis.Trace}, time_range, align=zeros(length(S)), weight; method=:linear, n=nothing) -> s::Seis.Trace
 
 Return the linear stack of all traces in `S`, aligned in time on the
 value in `align`, between `times[1]` and `times[end]`.
@@ -134,7 +134,9 @@ if not all traces can be included in the stack.
 If provided, traces are weighted by the values in `weight`, which are normalised
 to sum to unity.
 
-Available stacking methods are: $(AVAILABLE_STACK_METHODS).
+Available stacking methods are: $(AVAILABLE_STACK_METHODS).  If using
+`:nthroot` or `:phaseweight`, the order of the stack `n` must also be
+passed as a keyword argument
 """
 function stack(S::AbstractArray{<:Seis.Trace{T}}, time_range,
                align::Union{Symbol,AbstractArray}=zeros(T, length(S));
