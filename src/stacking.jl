@@ -115,12 +115,12 @@ end
 const AVAILABLE_STACK_METHODS = (:linear, :nthroot, :phaseweight)
 
 """
-    stack(S::AbstractArray{Seis.Trace}, time_range, align=zeros(length(S)), weight; method=:linear, n=nothing) -> s::Seis.Trace
+    Beamforming.stack(S::AbstractArray{Seis.Trace}, time_range, align=zeros(length(S)), weight; method=:linear, n=nothing) -> s::Seis.Trace
 
 Return the linear stack of all traces in `S`, aligned in time on the
 value in `align`, between `times[1]` and `times[end]`.
 
-`times` can be a Tuple, Range or Array; in all cases, only the first and last values
+`time_range` can be a Tuple, Range or Array; in all cases, only the first and last values
 are used.  **N.B. If using a non-integer Range, this may not include the end value
 you expect.  E.g., `0.1:0.9` by default contains only the value `0.1` because the
 default step is `1`.**
@@ -137,6 +137,12 @@ to sum to unity.
 Available stacking methods are: $(AVAILABLE_STACK_METHODS).  If using
 `:nthroot` or `:phaseweight`, the order of the stack `n` must also be
 passed as a keyword argument
+
+!!! note
+    Since Julia v1.9, `stack` is a `Base` function.  From Julia v1.12 onwards,
+    `Beamforming.stack` clashes with `Base.stack` and is no longer exported.
+    Instead users need to explicitly import it, or call it via e.g.
+    `Beamforming.stack`.
 """
 function stack(S::AbstractArray{<:Seis.Trace{T}}, time_range,
                align::Union{Symbol,AbstractArray}=zeros(T, length(S));

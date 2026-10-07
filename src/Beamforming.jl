@@ -6,7 +6,9 @@ Stack seismic data in various ways, based on [Seis.jl](https://githib.com/anowac
 ## Exported functions
 - `array_response`: Compute the array response function for an array.
 - `beamform`: Find the beam power on a grid of slownesses ('beampacking').
-- `stack`: Stack up traces using various methods.
+- `Beamforming.stack`: Stack up traces using various methods.  (Note this function
+  is public but not exported because it conflicts with `Base.stack` which
+  has a different meaning.)
 - `vespagram`: Form a vespagram (slowness–time).
 - The above, but using cross-correlation beamforming:
   - `crosscorrelation_array_response`: Array response.
@@ -24,24 +26,23 @@ import Seis
 
 using Statistics: mean
 
-@static if VERSION >= v"1.9"
-    import Base.stack
-end
-
 export
     array_response,
     beamform,
     crosscorrelation_array_response,
     crosscorrelation_beamform,
     crosscorrelation_beamform_corrs,
-    stack,
-    vespagram,
     plot_array_response!,
     plot_array_response,
     plot_beamforming!,
     plot_beamforming,
     plot_vespagram,
-    plot_vespagram!
+    plot_vespagram!,
+    vespagram
+
+public
+    verbose,
+    stack
 
 function __init__()
     if isdefined(Base.Experimental, :register_error_hint)

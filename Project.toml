@@ -1,7 +1,7 @@
 name = "Beamforming"
 uuid = "bdfe4746-bf38-11e9-1e2c-db8d7c02fe8b"
 authors = ["Andy Nowacki <a.nowacki@leeds.ac.uk>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
@@ -27,7 +27,7 @@ Makie = "0.20, 0.21, 0.22, 0.23, 0.24"
 RecipesBase = "0.7, 0.8, 1"
 Seis = "0.3, 0.4"
 Statistics = "<0.0.1, 1"
-julia = "1.6"
+julia = "1.11"
 
 [extras]
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
